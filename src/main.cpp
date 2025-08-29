@@ -11,6 +11,8 @@
 #define Bb 17
 #define Ac 10
 #define Bc 9
+//あいうえお
+
 
 #define SERVICE_UUID        "32e29e2d-e309-42d6-833f-597d88fae281"
 #define CHARACTERISTIC_UUID "c63c080c-5ccc-4905-a015-c59634eef0bc"
