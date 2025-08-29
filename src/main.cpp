@@ -1,211 +1,212 @@
-#include <Arduino.h>
-#include <BLEDevice.h>
-#include <BLEServer.h>
-#include <math.h>
-//#include <esp32-hal-timer.h>
-//#include <BLEUtils.h>
+/*
+基準について
+「機体を上から見て」は機体の前方向を上にしたときを基準とする。
+進行方向θは、上から見て機体の右方向を0度とし、反時計回りを正とする。
+機体の回転についても反時計回りを正とする。
+モーターについて、機体が前に進む向きを正とする。
 
-#define Aa 15
-#define Ba 7
-#define Ab 18
-#define Bb 17
-#define Ac 10
-#define Bc 9
-//あいうえお
+#define Apin 41
+#define Bpin 38
+#define steps 8192
 
-
-#define SERVICE_UUID        "32e29e2d-e309-42d6-833f-597d88fae281"
-#define CHARACTERISTIC_UUID "c63c080c-5ccc-4905-a015-c59634eef0bc"
-
-int stickRx = 0, stickRy = 0, stickLx = 0, stickLy = 0;
-int t0Value = 0, t1Value = 0;
-
-class BLECallbacks : public BLECharacteristicCallbacks {
-  void onWrite(BLECharacteristic *pCharacteristic) override {
-    std::string raw = pCharacteristic->getValue();
-
-    if (raw[0] == 0x01 && raw.back() == 0x03) { //␁label␂data␃
-      size_t stxPos = raw.find(0x02);
-
-      if (stxPos != std::string::npos) {
-        std::string label = raw.substr(1, stxPos - 1);
-        std::string data = raw.substr(stxPos + 1, raw.size() - stxPos - 2);
-
-        size_t commaPos = data.find(',');
-        if (commaPos != std::string::npos) {
-          String xStr = data.substr(0, commaPos).c_str();
-          String yStr = data.substr(commaPos + 1).c_str();
-
-          if(label == "d0") {
-            stickLx = xStr.toInt() - 512;   stickLy = yStr.toInt() - 512;
-          }
-          if(label == "d1") {
-            stickRx = xStr.toInt() - 512;   stickRy = yStr.toInt() - 512;
-          }
-          
-
-        } else if(label == "t0") {
-
-          String textStr = data.c_str();
-            t0Value = textStr.toInt();
-            Serial.println(t0Value);
-
-        } else if(label == "t1") {
-
-          String textStr = data.c_str();
-            t1Value = textStr.toInt();
-            Serial.println(t1Value);
-
-        } else if(0) {
-          //other label here
-
-        }
-
-      }
-
-    } else {
-      Serial.println("Invalid format.");
-
-    }
-  }
-};
-
-class BLEConnectCallbacks : public BLEServerCallbacks {
-  void onConnect(BLEServer* pServer) {
-    Serial.println("Connected");
-  }
-  void onDisconnect(BLEServer* pServer) {
-    Serial.println("Disconnected");
-    stickLx = 0;   stickLy = 0;
-    stickRx = 0;   stickRy = 0;
-    pServer->getAdvertising()->start();
-  }
-};
+RotaryEncoderPCNT encoder(Apin, Bpin);
 
 void setup() {
   Serial.begin(115200);
-  BLEDevice::init("ESP32_BLE");  // デバイス名を設定
-  BLEServer *pServer = BLEDevice::createServer();  // BLEサーバーを作る
-  BLEService *pService = pServer->createService(SERVICE_UUID);  // サービスを作成
-
-  BLECharacteristic *pCharacteristic = pService->createCharacteristic(
-    CHARACTERISTIC_UUID,
-    BLECharacteristic::PROPERTY_WRITE
-  );
-
-  pCharacteristic->setCallbacks(new BLECallbacks());
-  pServer->setCallbacks(new BLEConnectCallbacks());
-  pService->start();  // サービス開始
-
-  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
-  pAdvertising->addServiceUUID(SERVICE_UUID);
-  pAdvertising->start();  // 広告開始（スマホに見えるように）
-  
-  Serial.println("BLE device is ready and waiting...");
-  
-  pinMode(Aa, OUTPUT);
-  pinMode(Ba, OUTPUT);
-  pinMode(Ab, OUTPUT);
-  pinMode(Bb, OUTPUT);
-  pinMode(Ac, OUTPUT);
-  pinMode(Bc, OUTPUT);
+  delay(800);
+  Serial.print("***Ready***");
 }
 
-float lx, ly, rx, ry;   //current input left/right
-float cx = 0, cy = 0, cw = 0;   //current output
+void loop(){
+  Serial.println(encoder.position());
+  delay(200);
+}
 
-const int pulseRate = ( 100 ); // ~500,000Hz
-const float head_offset = ( 60 ) * M_PI / 180;
-const float wheelR = ( 1 );    //propotional to diameter of wheel
-float motorMaxAngAcc = ( 5 );   //angular acceleration threshold(角加速度限界)    mm/(s*s)
+*/
 
-const float robotR = ( 1 );
-const float motorMaxSpeed = 235;
+#include <Arduino.h>
+#include <math.h>
+#include <RotaryEncoderPCNT.h>
+
+
+const int Apin[4] = {0, 0, 0, 0};
+const int Bpin[4] = {0, 0, 0, 0};
+
+const int PULSE_RATE = 1000; // [pulse/s]
+const int PWM_MAX = 255; //最大PWM値
+
+const float aMAX = 60; //[mm/s^2] モーターの最大加速度（接地面基準）
+float aLIMIT = aMAX; //[mm/s^2] 機体の加速度制限（接地面基準）
+const float vMAX = 100; //[mm/s] モーターの最大速度(接地面基準）
+float vLIMIT = vMAX; //[mm/s] 機体の速度制限（接地面基準）
+
+const float WHEEL_X = 100, WHEEL_Y = 100; //ホイールのX, Y [mm]
+const float K[4] = {1, 1, 1, 1}; //モーターのK値（モーターごとの調整）
+
+
+void setup() {
+  Serial.begin(115200);
+  for(int i = 0; i < 4; i++) {
+    pinMode(Apin[i], OUTPUT);
+    pinMode(Bpin[i], OUTPUT);
+  }
+
+}
+
+int pwm[4] = {0}; //各モーターのPWM値
+
+void motor_write() {
+  for(int i = 0; i < 4; i++) {
+    if(pwm[i] >= 0) {
+      analogWrite(Apin[i], pwm[i]);
+      analogWrite(Bpin[i], 0);
+    } else {
+      analogWrite(Apin[i], 0);
+      analogWrite(Bpin[i], -pwm[i]);
+    }
+  }
+  return;
+}
+
+int translation_motion(float lengh, float angle) { //移動中は０、移動終了時に１を返す
+  static int step = 0; //現在のステップ
+  static int step_remember = 0; //段階変化時のステップ
+  static int step_count = 0; //ステップのカウント
+  static int phase = 0; //現在の段階
+  static float cv = 0; //現在の速度
+  static float at_MAX = 0; //移動偏角ごとの加速度
+  static float vt_MAX = 0; //移動偏角ごとの速度
+  static float pre_lengh = 0; //前回の目標移動距離
+  static float pre_angle = 0; //前回の目標移動偏角
+
+  if( lengh == 0 || angle == 0) { //目標移動距離が0または目標移動偏角が0ならば
+    for(int i = 0; i < 4; i++) pwm[i] = 0; //モーターを停止
+    motor_write(); //モーターにPWM値を書き込む
+    return 1; //終了
+  } else if(pre_lengh != lengh || pre_angle != angle) {
+    if(cv != 0) {
+      cv -= at_MAX / PULSE_RATE; //現在の速度を減速
+      if(cv < 0) cv = 0; //速度を0に制限
+      for(int i = 0; i < 4; i++)
+        pwm[i] = K[i] * PWM_MAX * cv / vMAX * 
+        (sinf(pre_angle) + ((i%2)*2-1)*cosf(pre_angle)); //各モーターのPWM値を計算
+      motor_write(); //モーターにPWM値を書き込む
+      return 0; //継続
+    } else { //移動開始
+      step = 0; //ステップをリセット
+      phase = 0; //段階をリセット
+      at_MAX = aMAX / (abs(sinf(angle)) + abs(cosf(angle))); //移動偏角ごとの最大加速度
+      if(at_MAX > aLIMIT) at_MAX = aLIMIT; //加速度制限
+      vt_MAX = vMAX / (abs(sinf(angle)) + abs(cosf(angle))); //移動偏角ごとの最大速度)
+      if(vt_MAX > vLIMIT) vt_MAX = vLIMIT; //速度制限
+      step_count = PULSE_RATE * (lengh / vt_MAX - vt_MAX / at_MAX); //定速段階のステップ数を計算
+      if(step_count < 0) {
+        step_count = PULSE_RATE * sqrt(lengh / at_MAX); //定速段階がない場合は加速段階のステップ数を計算
+        phase = 3; //最大まで加速しないとき特殊フェーズに移行
+      }
+    }
+  }
+
+  switch(phase) {
+    case 0: //加速段階
+      cv += at_MAX / PULSE_RATE; //加速度を適用
+      if(cv > vt_MAX) { //最大速度を超えたら
+        cv = vt_MAX; //最大速度に制限
+        phase = 1; //定速段階へ移行
+        step_remember = step; //段階変化時のステップを記憶
+      } break;
+    case 1: //定速段階
+      if(step - step_remember >= step_count) { //目標距離に到達したら
+        phase = 2; //減速段階へ移行
+      } break;
+    case 2: //減速段階
+      cv -= at_MAX / PULSE_RATE; //減速度を適用
+      if(cv < 0) { //速度が0未満になったら
+        cv = 0; //速度を0に制限
+        for(int i = 0; i < 4; i++) pwm[i] = 0;
+        motor_write(); //モーターにPWM値を書き込む
+        return 1; //終了
+      } break;
+    case 3: //最大まで加速しない特殊段階
+      if(step >= step_count) {
+        phase = 2; //減速段階へ移行
+      } else {
+        cv += at_MAX / PULSE_RATE; //加速度を適用
+      }
+      if(cv > vt_MAX) { //最大速度を超えたら
+        cv = vt_MAX; //最大速度に制限
+        return 1; //終了
+      } break;
+    default: break; //不正な段階は無視
+  }
+  step++; //ステップを進める
+
+  for(int i = 0; i < 4; i++)
+    pwm[i] = K[i] * (PWM_MAX/vMAX) * cv * 
+    (sinf(angle) + ((i%2)*2-1)*cosf(angle)); //各モーターのPWM値を計算
+  
+  motor_write(); //モーターにPWM値を書き込む
+
+  pre_lengh = lengh;
+  pre_angle = angle;
+
+  return 0; //継続
+}
 
 void loop() {
+  static int main_phase = 0; //メインフェーズ
+  static float target_length = 0; //目標移動距離
+  static float target_angle = 0; //目標移動偏角
+  aLIMIT = aMAX; //加速度制限をリセット
+  vLIMIT = vMAX; //速度制限をリセット
 
-  while (micros() % (1000000 / pulseRate) > 1) {}
-  //Serial.println(micros());
-
-  //目標値（入力値）
-  lx = stickLx / 2;   ly = stickLy / 2;
-  rx = stickRx / 2;   //ry = stickRy / 2;
-
-  float inputr = sqrt(lx*lx + ly*ly);
-  if(inputr > motorMaxSpeed) {
-    lx = lx * motorMaxSpeed / inputr;
-    ly = ly * motorMaxSpeed / inputr;
-  }
-  if(abs(rx) > motorMaxSpeed) rx = rx * motorMaxSpeed / abs(rx);
+  while(micros() % (1000000 / PULSE_RATE) > 1) {} //一定間隔でループを実行
   
-  //目標と現在の値の差分をとる
-  float dx = lx - cx;
-  float dy = ly - cy;
+  switch(main_phase) {
 
-  float dr = sqrt(dx*dx + dy*dy);
-  float dtheta = atan2f(dy, dx);
+    //単純な移動
+    case 0:
+      target_length = 100; //目標移動距離を設定
+      target_angle = M_PI / 2; //目標移動偏角を設定
+      if(translation_motion(target_length, target_angle)) { //移動が終了したら
+        main_phase = 1; //次のフェーズへ移行
+      }
+      break;
 
-  float dta, dtb, dtc;
-  dta = M_PI*(0)/180 - head_offset - dtheta;
-  dtb = M_PI*(120)/180 - head_offset - dtheta;
-  dtc = M_PI*(240)/180 - head_offset - dtheta;
+    //慎重な移動
+    case 1:
+      target_length = 100; //目標移動距離を設定
+      target_angle = M_PI * 3 / 2; //目標移動偏角を設定
+      aLIMIT = 20; //加速度制限を設定
+      vLIMIT = 30; //速度制限を設定
+      if(translation_motion(target_length, target_angle)) { //移動が終了したら
+        main_phase = 2; //次のフェーズへ移行
+      }
+      break;
 
-  float dw = rx - cw;
-  
-  float ratio = max(abs(dr*cosf(dta) - dw*robotR), 
-                max(abs(dr*cosf(dtb) - dw*robotR), 
-                    abs(dr*cosf(dtc) - dw*robotR))) / motorMaxAngAcc;
-
-  if(ratio > 1) {
-    cx += dx / ratio;
-    cy += dy / ratio;
-    cw += dw / ratio;
-  } else {
-    cx = lx;    cy = ly;    cw = rx;
+    //探りながら移動
+    case 2:
+      target_length = 100; //目標移動距離を設定
+      target_angle = 0; //目標移動偏角を設定
+      aLIMIT = 20; //加速度制限を設定
+      vLIMIT = 30; //速度制限を設定
+      if(translation_motion(target_length, target_angle)) { //移動が終了したら
+        main_phase = 2; //次のフェーズへ移行
+      } else {
+        //ここに監視コード
+        /*
+        example:
+        if(sensor_data > threshold) {
+          translation_motion(0, 0); //移動を急停止
+          Serial.println("Sensor triggered, stopping motors."); 
+        }
+        */
+      }
+      break;
+    
+    //不正なフェーズ
+    default:
+      translation_motion(0, 0); //不正なフェーズは移動を急停止
+      break;
   }
-  float r = sqrt(cx*cx + cy*cy);
-  float theta = atan2f(cy, cx);
-
-  float ta, tb, tc;
-  ta = M_PI*(0)/180 - head_offset - theta;
-  tb = M_PI*(120)/180 - head_offset - theta;
-  tc = M_PI*(240)/180 - head_offset - theta;
-
-  int wa, wb, wc;
-  wa = (r*cosf(ta) + cw) / wheelR;
-  wb = (r*cosf(tb) + cw) / wheelR;
-  wc = (r*cosf(tc) + cw) / wheelR;
-
-  ratio = max(abs(wa), 
-          max(abs(wb), 
-              abs(wc))) / motorMaxSpeed;
-
-  if(ratio > 1) {
-  wa /= ratio;
-  wb /= ratio;
-  wc /= ratio;
-  }
-
-  if(wa > 0){
-    analogWrite(Aa, wa);
-    analogWrite(Ba, 0);
-  } else {
-    analogWrite(Aa, 0);
-    analogWrite(Ba, -wa);
-  }
-  if(wb > 0){
-    analogWrite(Ab, wb);
-    analogWrite(Bb, 0);
-  } else {
-    analogWrite(Ab, 0);
-    analogWrite(Bb, -wb);
-  }
-  if(wc > 0){
-    analogWrite(Ac, wc);
-    analogWrite(Bc, 0);
-  } else {
-    analogWrite(Ac, 0);
-    analogWrite(Bc, -wc);
-  }
-
 }
