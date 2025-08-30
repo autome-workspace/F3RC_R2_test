@@ -22,4 +22,4 @@ void loop() {
         Serial.print("ヨー角: ");
         Serial.println(yaw);
     }
-}
+}  
