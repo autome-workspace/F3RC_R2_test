@@ -3,9 +3,10 @@
 
 #include <Arduino.h>
 
-class OdometryLibrary {
+class Odometry {
     public:
-        void odometrySetWheel(int8_t wheelNumber, float wheelDiameter, float wheelDistance);
+        void odometrySetWheel(float x, float y, float r);
+        void odometrySetWheel(uint8_t wheelNumber, float wheelDiameter);
         void odometrySetMax(float ODOMETRY_ACC_MAX);
         void odometrySetLimit(float odometryAccLimit);
         

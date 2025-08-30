@@ -1,7 +1,7 @@
-#include "driveLibrary.h"
+#include "Drive.h"
 #include <Arduino.h>
 
-void DriveLibrary::driveSetMotor(int8_t motorNumber, int8_t motorPinA, int8_t motorPinB) {
+void Drive::driveSetMotor(uint8_t motorNumber, uint8_t motorPinA, uint8_t motorPinB) {
     //motorNumber: モーター番号(0~3)
     //motorPinA: モーターAピン
     //motorPinB: モーターBピン
@@ -12,7 +12,7 @@ void DriveLibrary::driveSetMotor(int8_t motorNumber, int8_t motorPinA, int8_t mo
     pinMode(motorPinB, OUTPUT);
 }
 
-void DriveLibrary::driveSetMax(int8_t PWM_MAX, float MOTOR_SPD_MAX, float MOTOR_ACC_MAX) {
+void Drive::driveSetMax(uint8_t PWM_MAX, float MOTOR_SPD_MAX, float MOTOR_ACC_MAX) {
     //PWM_MAX: PWM最大値
     //MOTOR_SPD_MAX: モーター最大速度  
     //MOTOR_ACC_MAX: モーター最大加速度
@@ -21,13 +21,13 @@ void DriveLibrary::driveSetMax(int8_t PWM_MAX, float MOTOR_SPD_MAX, float MOTOR_
     _MOTOR_ACC_MAX = MOTOR_ACC_MAX;
 }
 
-void DriveLibrary::driveSetLimit(float motorSpdLimit, float motorAccLimit) {
+void Drive::driveSetLimit(float motorSpdLimit, float motorAccLimit) {
     //motorSpdLimit: 速度制限
     //motorAccLimit: 加速度制限
     _motorSpdLimit = motorSpdLimit;
     _motorAccLimit = motorAccLimit;
 }
-bool DriveLibrary::drive(float distance, float radians, float turnRadians) {
+bool Drive::drive(float distance, float radians, float turnRadians) {
     //distance: 移動距離
     //radians: 進行方向
     //turnRadians: 回転量

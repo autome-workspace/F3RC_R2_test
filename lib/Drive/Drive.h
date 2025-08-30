@@ -3,10 +3,12 @@
 
 #include <Arduino.h>
 
-class DriveLibrary {
+class Drive {
     public:
-        void driveSetMotor(int8_t motorNumber, int8_t motorPinA, int8_t motorPinB);
-        void driveSetMax(int8_t PWM_MAX, float MOTOR_SPD_MAX, float MOTOR_ACC_MAX);
+        void drive();
+
+        void driveSetMotor(uint8_t motorNumber, uint8_t motorPinA, uint8_t motorPinB);
+        void driveSetMax(uint8_t PWM_MAX, float MOTOR_SPD_MAX, float MOTOR_ACC_MAX);
         void driveSetLimit(float motorSpdLimit, float motorAccLimit);
         
         //bool driveLinear(float distance, float radians);
@@ -15,8 +17,8 @@ class DriveLibrary {
         bool stop();
 
     private:
-        int8_t _motorPIN[4][2];
-        int8_t _PWM_MAX;
+        uint8_t _motorPIN[4][2];
+        uint8_t _PWM_MAX;
         float _MOTOR_SPD_MAX;
         float _MOTOR_ACC_MAX;
         float _motorSpdLimit;
