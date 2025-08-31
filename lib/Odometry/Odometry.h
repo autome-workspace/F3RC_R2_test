@@ -2,36 +2,36 @@
 #define ODOMETRY_H
 
 #include <Arduino.h>
+#include <math.h>
 #include "Encoder.h"
+#include "BNO055.h"
 
 class Odometry {
 public:
-    //コンストラクタ
-    Odometry(float wheel1_x, float wheel1_y, float wheel2_x, float wheel2_y);
+    // コンストラクタ 1はｘ軸に垂直、2はy軸に平行
+    // wheel_Distance: 車輪の直線経路からロボット中心までの距離(mm)
+    Odometry(Encoder* encoder, BNO055* bno055, 
+             float wheelx_Distance, float wheely_Distance);
 
-    //初期化
+    // 初期化
     void begin();
+    void update();
 
-
-    void odometrySetWheel(float x, float y, float r);
-    void odometrySetWheel(uint8_t wheelNumber, float wheelDiameter);
-    void odometrySetMax(float ODOMETRY_ACC_MAX);
-    void odometrySetLimit(float odometryAccLimit);
-    
-    void odometryUpdate();
     float getX();
     float getY();
-    float getTheta();
+    float getYaw();
 
 private:
-    float _wheelDiameter[2]; // 0: left wheel, 1: right wheel
-    float _wheelDistance; // Distance between the two wheels
-    float _ODOMETRY_ACC_MAX;
-    float _odometryAccLimit;
+    const float _wheelx_Distance;
+    const float _wheely_Distance;
 
-    float _x = 0.0; // X position
-    float _y = 0.0; // Y position
-    float _theta = 0.0; // Orientation angle in radians
+    Encoder* _encoder;
+    BNO055* _bno;
+
+    float _current_x = 0.0; // X position(mm)
+    float _current_y = 0.0; // Y position(mm)
+    float _current_yaw = 0.0; // Orientation angle in radians
+    float _prev_yaw = 0.0; // Previous yaw angle in radians
 };
 
 

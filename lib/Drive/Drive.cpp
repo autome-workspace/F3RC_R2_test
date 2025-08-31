@@ -1,5 +1,4 @@
 #include "Drive.h"
-#include <Arduino.h>
 
 void Drive::driveSetMotor(uint8_t motorNumber, uint8_t motorPinA, uint8_t motorPinB) {
     //motorNumber: モーター番号(0~3)

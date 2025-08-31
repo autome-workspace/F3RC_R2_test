@@ -11,8 +11,8 @@ Encoder::Encoder(uint8_t encoder1_pinA, uint8_t encoder1_pinB,
     _prevEncoder1Count(0),
     _prevEncoder2Count(0)
 {
-    encoder1.attachHalfQuad(encoder1_pinA, encoder1_pinB);
-    encoder2.attachHalfQuad(encoder2_pinA, encoder2_pinB);
+    encoder1.attachFullQuad(encoder1_pinA, encoder1_pinB);
+    encoder2.attachFullQuad(encoder2_pinA, encoder2_pinB);
      
 }
 

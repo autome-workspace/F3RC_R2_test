@@ -21,9 +21,9 @@ public:
     void getCalibrationStatus(int* sys, int* gyr, int* acc, int* mag);
 
 private:
-    // 内部で使用する関数
-    bool _writeRegister(byte reg, byte value);
-    bool _readRegister(byte reg, byte* data, int len);
+    void _writeRegister(byte reg, byte value);
+    void _readRegister(byte reg, byte* data, int len);
+    float _yawOffsetRaw = 0.0f; // ヨー角のオフセット値
 };
 
 #endif

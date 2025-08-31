@@ -7,9 +7,11 @@
 class Encoder {
 public:
     // コンストラクタ: 2つのエンコーダのA相/B相ピンを受け取る
-    Encoder(uint8_t encoder1_pinA, uint8_t encoder1_pinB, uint8_t encoder2_pinA, uint8_t encoder2_pinB, uint16_t pulse, float wheelRadius);
+    Encoder(uint8_t encoder1_pinA, uint8_t encoder1_pinB, 
+            uint8_t encoder2_pinA, uint8_t encoder2_pinB, 
+            uint16_t pulse, float wheelRadius);
     
-    // ライブラリの初期化(現状必要なしだけど一応)
+    // 初期化
     void begin();
     
     // 1番目のエンコーダの値をリセット
