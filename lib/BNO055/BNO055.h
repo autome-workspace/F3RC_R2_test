@@ -23,7 +23,7 @@ public:
 private:
     void _writeRegister(byte reg, byte value);
     void _readRegister(byte reg, byte* data, int len);
-    float _yawOffsetRaw = 0.0f; // ヨー角のオフセット値
+    int16_t _yawOffsetRaw; // ヨー角のオフセット値
 };
 
 #endif

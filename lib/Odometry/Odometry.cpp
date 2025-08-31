@@ -23,7 +23,6 @@ void Odometry::update() {
     _prev_yaw = _current_yaw;
 
     // 回転による見かけ上の並進移動を補正
-    // (ここでエンコーダ1がX軸、エンコーダ2がY軸を測定すると仮定)
     float dx_corrected = dx_raw - dyaw * _wheelx_Distance;
     float dy_corrected = dy_raw - dyaw * _wheely_Distance;
     

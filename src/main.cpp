@@ -11,10 +11,9 @@
 #define ENCODERY_PINA 3
 #define ENCODERY_PINB 4
 #define ENCODER_PULSE_PER_REV 8192 // pulse/rev
-#define ENCODER_WHEEL_RADIUS 20.0f // mm
 #define WHEELX_DISTANCE 55.0f // mm
 #define WHEELY_DISTANCE 55.0f // mm
-
+float ENCODER_WHEEL_RADIUS = 20.0f; // mm
 
 #define MOTOR1_PINA 5
 #define MOTOR1_PINB 6
@@ -25,11 +24,14 @@
 #define MOTOR4_PINA 13
 #define MOTOR4_PINB 14
 #define MOTOR_PWM_MAX 255
-const float MOTOR_SPD_MAX = 100.0f; // mm/s
-const float MOTOR_ACC_MAX = 200.0f; // mm/s^2
-const float MOTOR_SPD_LIMIT = 50.0f; // mm/s
-const float MOTOR_ACC_LIMIT = 150.0f; // mm/s^2
-const float MOTOR_WHEEL_RADIUS = 30.0f; // mm
+float MOTOR_SPD_MAX = 100.0f; // mm/s
+float MOTOR_ACC_MAX = 200.0f; // mm/s^2
+float MOTOR_SPD_LIMIT = 50.0f; // mm/s
+float MOTOR_ACC_LIMIT = 150.0f; // mm/s^2
+float MOTOR_WHEEL_RADIUS = 30.0f; // mm
+
+#define MAIN_PULSE_RATE 1000 // Hz
+#define ODOM_PULSE_RATE 100 // Hz
 
 // ライブラリのインスタンスを生成
 Encoder encoder(ENCODERX_PINA, ENCODERX_PINB, 
@@ -57,19 +59,9 @@ void setup() {
 }
 
 void loop() {
-    // 1000Hzでオドメトリを更新
-    odometry.update();
-
-    // デバッグ情報（例：100msごとに表示）
-    static unsigned long lastPrintTime = 0;
-    if (millis() - lastPrintTime > 100) {
-        lastPrintTime = millis();
-        Serial.print("X: ");
-        Serial.print(odometry.getX());
-        Serial.print(" mm, Y: ");
-        Serial.print(odometry.getY());
-        Serial.print(" mm, Theta: ");
-        Serial.print(odometry.getYaw());
-        Serial.println(" degrees");
-    }
+    static long loopCount = 0;
+    loopCount++;
+    while(micros() % 1000000 / MAIN_PULSE_RATE > 10);
+    if(loopCount % (MAIN_PULSE_RATE / ODOM_PULSE_RATE) == 0)
+        odometry.update();
 }
