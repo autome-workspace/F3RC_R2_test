@@ -2,13 +2,17 @@
 #define ODOMETRY_H
 
 #include <Arduino.h>
+#include "Encoder.h"
 
 class Odometry {
 public:
+    //コンストラクタ
+    Odometry(float wheel1_x, float wheel1_y, float wheel2_x, float wheel2_y);
 
-
-
+    //初期化
     void begin();
+
+
     void odometrySetWheel(float x, float y, float r);
     void odometrySetWheel(uint8_t wheelNumber, float wheelDiameter);
     void odometrySetMax(float ODOMETRY_ACC_MAX);

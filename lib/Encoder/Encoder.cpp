@@ -1,32 +1,50 @@
 #include "Encoder.h"
 
-Encoder::Encoder(int encoder1_pinA, int encoder1_pinB, int encoder2_pinA, int encoder2_pinB)
-: encoder1(), encoder2() 
+Encoder::Encoder(uint8_t encoder1_pinA, uint8_t encoder1_pinB, 
+                 uint8_t encoder2_pinA, uint8_t encoder2_pinB, 
+                 uint16_t pulse, float wheelRadius)
+:   encoder1(), 
+    encoder2(), 
+    _pulse(pulse),
+    _wheelRadius(wheelRadius),
+    _k(2 * M_PI * _wheelRadius / _pulse), // 2πr/pulse
+    _prevEncoder1Count(0),
+    _prevEncoder2Count(0)
 {
     encoder1.attachHalfQuad(encoder1_pinA, encoder1_pinB);
     encoder2.attachHalfQuad(encoder2_pinA, encoder2_pinB);
+     
 }
 
 void Encoder::begin() {
-    // PCNTライブラリはインスタンス化とattachHalfQuad()で初期化が完了するため空でよい
+    _prevEncoder1Count = encoder1.getCount();
+    _prevEncoder2Count = encoder2.getCount();
 }
 
 void Encoder::resetEncoder1() {
     // 1番目のエンコーダのカウント値を0にリセットする
     encoder1.setCount(0);
+    _prevEncoder1Count = 0;
 }
 
 void Encoder::resetEncoder2() {
     // 2番目のエンコーダのカウント値を0にリセットする
     encoder2.setCount(0);
+    _prevEncoder2Count = 0;
 }
 
-long Encoder::getEncoder1Value() {
-    // 1番目のエンコーダの現在のカウント値を取得する
-    return encoder1.getCount();
+float Encoder::getEncoder1Displacement() {
+    // 1番目のエンコーダの現在の移動量を取得する
+    long currentCount = encoder1.getCount();
+    long deltaCount = currentCount - _prevEncoder1Count;
+    _prevEncoder1Count = currentCount;
+    return _k * deltaCount;
 }
 
-long Encoder::getEncoder2Value() {
-    // 2番目のエンコーダの現在のカウント値を取得する
-    return encoder2.getCount();
+float Encoder::getEncoder2Displacement() {
+    // 2番目のエンコーダの現在の移動量を取得する
+    long currentCount = encoder2.getCount();
+    long deltaCount = currentCount - _prevEncoder2Count;
+    _prevEncoder2Count = currentCount;
+    return _k * deltaCount;
 }

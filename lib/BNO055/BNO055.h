@@ -17,10 +17,13 @@ public:
     // ヨー角を読み出す関数
     float getYaw();
 
+    // SYS (システム), GYR (ジャイロ), ACC (加速度), MAG (磁力計)
+    void getCalibrationStatus(int* sys, int* gyr, int* acc, int* mag);
+
 private:
     // 内部で使用する関数
-    void _writeRegister(byte reg, byte value);
-    void _readRegister(byte reg, byte* data, int len);
+    bool _writeRegister(byte reg, byte value);
+    bool _readRegister(byte reg, byte* data, int len);
 };
 
 #endif
