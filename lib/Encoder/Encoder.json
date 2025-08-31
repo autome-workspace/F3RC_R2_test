@@ -1,0 +1,11 @@
+{
+  "name": "Encoder",
+  "version": "1.0.0",
+  "description": "A library for handling rotary encoders on ESP32",
+  "keywords": "encoder, rotary, ESP32",
+  "frameworks": "arduino",
+  "platforms": "espressif32",
+  "dependencies": [
+      "MaffooClock/ESP32RotaryEncoder"
+  ]
+}
