@@ -10,7 +10,7 @@ class Odometry {
         void odometrySetMax(float ODOMETRY_ACC_MAX);
         void odometrySetLimit(float odometryAccLimit);
         
-        void odometryUpdate(float leftWheelSpeed, float rightWheelSpeed, float deltaTime);
+        void odometryUpdate();
         float getX();
         float getY();
         float getTheta();

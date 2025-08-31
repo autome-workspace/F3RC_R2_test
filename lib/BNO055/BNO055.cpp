@@ -7,11 +7,11 @@ bool BNO055::begin() {
 
     // レジスタアドレスやモード設定はデータシートを参照
     // 1. CONFIGモードに設定
-    _writeRegister(0x3D, 0x00); 
+    _writeRegister(0x3D, 0x00);
     delay(20);
 
     // 2. NDOFモードに設定
-    _writeRegister(0x3D, 0x0C); 
+    _writeRegister(0x3D, 0x0C);
     delay(20);
 
     // BNO055の接続確認
