@@ -1,5 +1,5 @@
-#ifndef DRIVE_LIBRARY_H
-#define DRIVE_LIBRARY_H
+#ifndef DRIVE_H
+#define DRIVE_H
 
 #include <Arduino.h>
 

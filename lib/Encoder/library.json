@@ -1,0 +1,9 @@
+{
+  "name": "Encoder",
+  "version": "1.0.0",
+  "description": "ぱるすカウンタを使ってエンコーダふたつをまとめて扱うライブラリ",
+  "keywords": "encoder, rotary, dual, PCNT, ESP32",
+  "frameworks": "arduino",
+  "platforms": "espressif32",
+  "dependencies": ["madhephaestus/ESP32Encoder"]
+}
