@@ -2,21 +2,20 @@
 #define DRIVE_H
 
 #include <Arduino.h>
+#include "Odometry.h"
 
 class Drive {
 public:
 
     // コンストラクタ
-    Drive(uint8_t motor0_pinA, uint8_t motor0_pinB, bool rev0,
-          uint8_t motor1_pinA, uint8_t motor1_pinB, bool rev1,
-          uint8_t motor2_pinA, uint8_t motor2_pinB, bool rev2,
-          uint8_t motor3_pinA, uint8_t motor3_pinB, bool rev3,
-          uint16_t drive_pulse, float wheelRadius);
+    Drive(Odometry* odometry, uint16_t drive_pulse, float wheelRadius);
 
     // 限界設定
     void driveSetMax(uint8_t PWM_MAX, float MOTOR_SPD_MAX, float MOTOR_ACC_MAX);
     // 上限設定 (限界 > 上限 > 0)
     void driveSetLimit(float motorSpdLimit, float robotAccLimit);
+
+    void imadake(int _loopCount);
 
     //bool driveSimple(float targetX, float targetY, float targetRadians);
     //bool driveSimple(float targetX, float targetY);
@@ -36,10 +35,13 @@ private:
     float _MOTOR_ACC_MAX;
     float _motorSpdLimit;
     float _motorAccLimit;
-    
     float _wheelRadius;
+    float _currentSpeed;
+
+    Odometry* _odometry;
 
     void motorWrite(uint8_t motorNum, float motorSpd);
+
 
 };
 

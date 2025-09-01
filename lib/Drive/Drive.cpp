@@ -1,25 +1,9 @@
 #include "Drive.h"
 
-Drive::Drive(uint8_t motor0_pinA, uint8_t motor0_pinB, bool rev0,
-             uint8_t motor1_pinA, uint8_t motor1_pinB, bool rev1,
-             uint8_t motor2_pinA, uint8_t motor2_pinB, bool rev2,
-             uint8_t motor3_pinA, uint8_t motor3_pinB, bool rev3,
-             uint16_t drive_pulse, float wheelRadius)
-:   _motorPIN{{motor0_pinA, motor0_pinB}, 
-              {motor1_pinA, motor1_pinB},
-              {motor2_pinA, motor2_pinB},
-              {motor3_pinA, motor3_pinB}},
+Drive::Drive(Odometry* odometry, uint16_t drive_pulse, float wheelRadius)
+:   _odometry{odometry},
     _drive_pulse(drive_pulse),
-    _wheelRadius(wheelRadius)
-    {
-        for(int i = 0; i < 4; i++) {
-            // PWMは16kHz,　1024段階
-            ledcSetup(i, 16000, 10);
-            ledcSetup(i+4, 16000, 10);
-            ledcAttachPin(_motorPIN[i][0], i);
-            ledcAttachPin(_motorPIN[i][1], i + 4);
-        }
-    }
+    _wheelRadius(wheelRadius) {}
 
 void Drive::driveSetMax(uint8_t PWM_MAX, float MOTOR_SPD_MAX, float MOTOR_ACC_MAX) {
     //PWM_MAX: PWM最大値
@@ -39,7 +23,20 @@ void Drive::driveSetLimit(float motorSpdLimit, float motorAccLimit) {
 
 //bool Drive::drive(float targetX, float targetY, float targetRadians) {}
 
-bool Drive::drive(float targetX, float targetY) {}
+bool Drive::drive(float targetX, float targetY) {
+    float _current_x = _odometry->getX();
+    float _current_y = _odometry->getY();
+    float dx = targetX - _current_x;
+    float dy = targetY - _current_y;
+
+
+}
+
+void imadake(int _loopCount) {
+    for(int i = 0; i < 4; i++) {
+    motorWrite(i, sin(_loopCount / 80) * _motorSpdLimit);
+    }
+}
 
 bool Drive::drive(float targetRadians) {}
 
@@ -51,6 +48,5 @@ void Drive::motorWrite(uint8_t motorNum, float motorSpd) {
     } else {
         ledcWrite(motorNum, 0);
         ledcWrite(motorNum + 4, PWM);
-        
     }
 }

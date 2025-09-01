@@ -12,7 +12,7 @@
 #define ENCODERY_PINB 4
 #define ENCODER_PULSE_PER_REV 8192 // pulse/rev
 #define WHEELX_DISTANCE 55.0f // mm
-#define WHEELY_DISTANCE 55.0f // mm
+#define WHEELY_DISTANCE 0.0f // mm
 float ENCODER_WHEEL_RADIUS = 24.1f; // mm
 
 #define MOTOR0_PINA 7
@@ -78,12 +78,12 @@ void setup() {
     odometry.begin();
 
     for(int i = 0; i < 4; i++) {
-    // PWMは16kHz,　1024段階
-    ledcSetup(i, 16000, 10);
-    ledcSetup(i+4, 16000, 10);
-    ledcAttachPin(motorPIN[i][0], i);
-    ledcAttachPin(motorPIN[i][1], i + 4);
-}
+        // PWMは16kHz,　1024段階
+        ledcSetup(i, 16000, 10);
+        ledcSetup(i+4, 16000, 10);
+        ledcAttachPin(motorPIN[i][0], i);
+        ledcAttachPin(motorPIN[i][1], i + 4);
+    }
 
 }
 

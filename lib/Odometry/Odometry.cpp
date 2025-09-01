@@ -21,11 +21,13 @@ void Odometry::update() {
     float dy_raw = _encoder->getEncoder2Displacement();
     _current_yaw = _bno->getYaw();
     float dyaw = (_current_yaw - _prev_yaw);
+    if(dyaw < -M_PI) dyaw += 2*M_PI;
+    if(dyaw > M_PI) dyaw -= 2*M_PI;
     _prev_yaw = _current_yaw;
 
     // 回転による見かけ上の並進移動を補正
-    float dx_corrected = dx_raw - dyaw * _wheelx_Distance;
-    float dy_corrected = dy_raw - dyaw * _wheely_Distance;
+    float dx_corrected = dx_raw + dyaw * _wheelx_Distance;
+    float dy_corrected = dy_raw + dyaw * _wheely_Distance;
     
     // 4. グローバル座標系での変位を計算
     float dx_global = dx_corrected * cos(_current_yaw) - dy_corrected * sin(_current_yaw);
