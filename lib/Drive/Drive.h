@@ -16,26 +16,27 @@ public:
     // 限界設定
     void driveSetMax(uint8_t PWM_MAX, float MOTOR_SPD_MAX, float MOTOR_ACC_MAX);
     // 上限設定 (限界 > 上限 > 0)
-    void driveSetLimit(float motorSpdLimit, float motorAccLimit);
+    void driveSetLimit(float motorSpdLimit, float robotAccLimit);
 
     //bool driveSimple(float targetX, float targetY, float targetRadians);
     //bool driveSimple(float targetX, float targetY);
-    bool driveSimple(float targetRadians);
+    //bool driveSimple(float targetRadians);
 
-    //bool driveSimple(float targetX, float targetY, float targetRadians);
-    //bool driveSimple(float targetX, float targetY);
-    bool driveSimple(float targetRadians);
+    //bool drive(float targetX, float targetY, float targetRadians);
+    bool drive(float targetX, float targetY);
+    bool drive(float targetRadians);
     bool stop();
     bool quickStop();
 
 private:
     uint8_t _motorPIN[4][2]; // {{A, B}, {A, B}, ...}
+    uint16_t _drive_pulse;
     uint8_t _PWM_MAX;
     float _MOTOR_SPD_MAX;
     float _MOTOR_ACC_MAX;
     float _motorSpdLimit;
     float _motorAccLimit;
-    uint16_t _drive_pulse;
+    
     float _wheelRadius;
 
     void motorWrite(uint8_t motorNum, float motorSpd);

@@ -13,8 +13,11 @@ Drive::Drive(uint8_t motor0_pinA, uint8_t motor0_pinB, bool rev0,
     _wheelRadius(wheelRadius)
     {
         for(int i = 0; i < 4; i++) {
-            pinMode(_motorPIN[i][0], OUTPUT);
-            pinMode(_motorPIN[i][1], OUTPUT);
+            // PWMは16kHz,　1024段階
+            ledcSetup(i, 16000, 10);
+            ledcSetup(i+4, 16000, 10);
+            ledcAttachPin(_motorPIN[i][0], i);
+            ledcAttachPin(_motorPIN[i][1], i + 4);
         }
     }
 
@@ -33,9 +36,21 @@ void Drive::driveSetLimit(float motorSpdLimit, float motorAccLimit) {
     _motorSpdLimit = motorSpdLimit;
     _motorAccLimit = motorAccLimit;
 }
-bool Drive::drive(float distance, float radians, float turnRadians) {
-    //distance: 移動距離
-    //radians: 進行方向
-    //turnRadians: 回転量
 
+//bool Drive::drive(float targetX, float targetY, float targetRadians) {}
+
+bool Drive::drive(float targetX, float targetY) {}
+
+bool Drive::drive(float targetRadians) {}
+
+void Drive::motorWrite(uint8_t motorNum, float motorSpd) {
+    int PWM = _PWM_MAX * motorSpd / _MOTOR_SPD_MAX;
+    if(PWM > 0) {
+        ledcWrite(motorNum, PWM);
+        ledcWrite(motorNum + 4, PWM);
+    } else {
+        ledcWrite(motorNum, 0);
+        ledcWrite(motorNum + 4, PWM);
+        
+    }
 }

@@ -33,6 +33,11 @@ float MOTOR_WHEEL_RADIUS = 30.0f; // mm
 #define MAIN_PULSE_RATE 1000 // Hz
 #define ODOM_PULSE_RATE 100 // Hz
 
+uint8_t motorPIN[4][2] = {{MOTOR0_PINA, MOTOR0_PINB}, 
+                          {MOTOR1_PINA, MOTOR1_PINB},
+                          {MOTOR2_PINA, MOTOR2_PINB},
+                          {MOTOR3_PINA, MOTOR3_PINB}};
+
 // ライブラリのインスタンスを生成
 Encoder encoder(ENCODERX_PINA, ENCODERX_PINB, 
                 ENCODERY_PINA, ENCODERY_PINB, 
@@ -71,6 +76,14 @@ void setup() {
 
      // オドメトリの初期化
     odometry.begin();
+
+    for(int i = 0; i < 4; i++) {
+    // PWMは16kHz,　1024段階
+    ledcSetup(i, 16000, 10);
+    ledcSetup(i+4, 16000, 10);
+    ledcAttachPin(motorPIN[i][0], i);
+    ledcAttachPin(motorPIN[i][1], i + 4);
+}
 
 }
 
