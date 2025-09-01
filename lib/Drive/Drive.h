@@ -18,15 +18,15 @@ public:
     // 上限設定 (限界 > 上限 > 0)
     void driveSetLimit(float motorSpdLimit, float motorAccLimit);
 
-    bool driveSimple(float distance, float radians, float turnRadians);
-    bool driveSimple(float distance, float radians);
-    bool driveSimple(float turnRadians);
+    //bool driveSimple(float targetX, float targetY, float targetRadians);
+    //bool driveSimple(float targetX, float targetY);
+    bool driveSimple(float targetRadians);
 
-    bool drive(float distance, float radians, float turnRadians);
-    bool drive(float distance, float radians);
-    bool drive(float turnRadians);
+    //bool driveSimple(float targetX, float targetY, float targetRadians);
+    //bool driveSimple(float targetX, float targetY);
+    bool driveSimple(float targetRadians);
     bool stop();
-    bool quickStop;
+    bool quickStop();
 
 private:
     uint8_t _motorPIN[4][2]; // {{A, B}, {A, B}, ...}

@@ -6,14 +6,14 @@
 
 #define I2C_SDA 11
 #define I2C_SCL 12
-#define ENCODERX_PINA 1
-#define ENCODERX_PINB 2
+#define ENCODERX_PINA 41
+#define ENCODERX_PINB 38
 #define ENCODERY_PINA 3
 #define ENCODERY_PINB 4
 #define ENCODER_PULSE_PER_REV 8192 // pulse/rev
 #define WHEELX_DISTANCE 55.0f // mm
 #define WHEELY_DISTANCE 55.0f // mm
-float ENCODER_WHEEL_RADIUS = 20.0f; // mm
+float ENCODER_WHEEL_RADIUS = 24.1f; // mm
 
 #define MOTOR0_PINA 7
 #define MOTOR0_PINB 15
@@ -53,22 +53,24 @@ void setup() {
         Serial.println("BNO055 not found or failed to initialize.");
         while (1) delay(100);
     }
-    Serial.println("BNO055 initialized.");
 
-    // オドメトリの初期化
-    odometry.begin();
-    
-    bno.isFliped();
+    bno.isFliped(); // キャリブレーションフラグ
 
     if (bno.loadCalibration()) {
         Serial.println("EEPROMからキャリブレーションデータをロードしました。");
         Serial.println("センサーはすぐに使用可能です。");
-        delay(3000);
     } else {
         Serial.println("EEPROMに有効なキャリブレーションデータが見つかりませんでした。");
         Serial.println("センサーを動かしてキャリブレーションを完了させてください。");
-        while(1) delay(1000);
+        while(1) {
+            bno.isFliped();
+            delay(500);
+        }
     }
+    delay(100);
+
+     // オドメトリの初期化
+    odometry.begin();
 
 }
 
@@ -77,9 +79,9 @@ void loop() {
     loopCount++;
     
     while(micros() % (1000000 / MAIN_PULSE_RATE) > 10);
-    if(loopCount % (MAIN_PULSE_RATE / ODOM_PULSE_RATE) == 0)
+    if(loopCount % (MAIN_PULSE_RATE / ODOM_PULSE_RATE) == 0) {
         odometry.update();
-
-    Serial.println(bno.getAccZ());
+        Serial.printf("%7f\n", odometry.getX());
+    }
 
 }

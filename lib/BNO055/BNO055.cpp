@@ -14,8 +14,8 @@ bool BNO055::begin() {
     _writeRegister(0x3D, 0x00);
     delay(20);
     
-    _writeRegister(0x3F, 0x20); // RST_SYS ビットを1に設定
-    delay(1000); // リセット完了を待つ
+    //_writeRegister(0x3F, 0x20); // RST_SYS ビットを1に設定
+    //delay(1000); // リセット完了を待つ
 
     // 2. NDOFモードに設定
     _writeRegister(0x3D, 0x0C);
@@ -26,6 +26,7 @@ bool BNO055::begin() {
     _readRegister(0x00, &chip_id, 1);
     
     if (chip_id == 0xA0) {
+        delay(300);
         // 初期化が成功したら、現在のヨー角を読み取ってオフセットとして保存
         byte data[2];
         _readRegister(0x1A, data, 2);
@@ -37,22 +38,32 @@ bool BNO055::begin() {
 }
 
 // 起動時裏返しを検出すると、キャリブレーション開始
-bool BNO055::isFliped() {
+void BNO055::isFliped() {
+    delay(50);
     if(getAccZ() < -8.0) {
-        Serial.println("裏返しが検出されました。キャリブレーションしない場合、５秒以内に表向きにしてください");
-        _writeRegister(0x3F, 0x20); // RST_SYS ビットを1に設定
-        delay(5000); // リセット待ちを兼ねて
-
+        Serial.println("\n\n裏返しが検出されました。キャリブレーションしない場合、５秒以内に表向きにしてください");
+        Serial.printf("0 _ _ 1 _ _ 2 _ _ 3 _ _ 4 _ _ 5\n|");
+        for(int i = 0; i < 10; i++) {
+            delay(500);
+            Serial.printf("**|");
+            if(getAccZ() > 5.0) return;
+        }
+        Serial.println("");
         if(getAccZ() < -8.0) {
             Serial.println("裏返しのままのため、キャリブレーションを開始します。");
-            Serial.println("６面静止、８時の字に動かすなどしてキャリブレーション度を高めてください");
+            Serial.println("６面静止、８時の字に動かすなどしてキャリブレーション度を高めてください。");
+            Serial.println("*******************************");
+            _writeRegister(0x3F, 0x20); // RST_SYS ビットを1に設定(BNO055初期化)
+            delay(1000);
+            _writeRegister(0x3D, 0x0C); // NDOFモードに戻す
+            delay(20);
             while(!saveCalibration()) {
                 int sys, gyr, acc, mag;
                 getCalibrationStatus(&sys, &gyr, &acc, &mag);
                 Serial.printf("sys:%d  gyr:%d  acc:%d  mag:%d\n", sys, gyr, acc, mag);
                 delay(800);
             }
-            Serial.println("保存しました");
+            Serial.println("保存しました。再起動してください");
             while(1) delay(1000);
         }
     }

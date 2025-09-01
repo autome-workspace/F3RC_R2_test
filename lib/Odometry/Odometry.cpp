@@ -11,7 +11,8 @@ Odometry::Odometry(Encoder* encoder, BNO055* bno,
 void Odometry::begin() {
     _current_x = 0.0;
     _current_y = 0.0;
-    _current_yaw = 0.0;
+    _current_yaw = _bno->getYaw();
+    _prev_yaw = _current_yaw;
 }
 
 void Odometry::update() {

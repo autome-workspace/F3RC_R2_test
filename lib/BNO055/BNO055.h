@@ -31,7 +31,7 @@ public:
     bool begin();
 
     // キャリブレーションフラグ
-    bool isFliped();
+    void isFliped();
 
     // ヨー角を読み出す関数
     float getYaw();
