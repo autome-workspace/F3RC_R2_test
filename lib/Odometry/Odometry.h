@@ -20,6 +20,7 @@ public:
     float getX();
     float getY();
     float getYaw();
+    void getAll(float* x, float* y, float* yaw);
 
 private:
     const float _wheelx_Distance;

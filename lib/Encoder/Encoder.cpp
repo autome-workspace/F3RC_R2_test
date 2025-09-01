@@ -13,7 +13,6 @@ Encoder::Encoder(uint8_t encoder1_pinA, uint8_t encoder1_pinB,
 {
     encoder1.attachFullQuad(encoder1_pinA, encoder1_pinB);
     encoder2.attachFullQuad(encoder2_pinA, encoder2_pinB);
-     
 }
 
 void Encoder::begin() {

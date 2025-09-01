@@ -13,13 +13,8 @@ public:
     // 限界設定
     void driveSetMax(uint8_t PWM_MAX, float MOTOR_SPD_MAX, float MOTOR_ACC_MAX);
     // 上限設定 (限界 > 上限 > 0)
-    void driveSetLimit(float motorSpdLimit, float robotAccLimit);
+    void driveSetLimit(float ROBOT_SPD_LIMIT, float ROBOT_ACC_LIMIT);
 
-    void imadake(int _loopCount);
-
-    //bool driveSimple(float targetX, float targetY, float targetRadians);
-    //bool driveSimple(float targetX, float targetY);
-    //bool driveSimple(float targetRadians);
 
     //bool drive(float targetX, float targetY, float targetRadians);
     bool drive(float targetX, float targetY);

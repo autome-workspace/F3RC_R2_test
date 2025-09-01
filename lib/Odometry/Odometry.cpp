@@ -21,8 +21,8 @@ void Odometry::update() {
     float dy_raw = _encoder->getEncoder2Displacement();
     _current_yaw = _bno->getYaw();
     float dyaw = (_current_yaw - _prev_yaw);
-    if(dyaw < -M_PI) dyaw += 2*M_PI;
-    if(dyaw > M_PI) dyaw -= 2*M_PI;
+    if (dyaw < -M_PI) dyaw += 2*M_PI;
+    if (dyaw > M_PI) dyaw -= 2*M_PI;
     _prev_yaw = _current_yaw;
 
     // 回転による見かけ上の並進移動を補正
@@ -42,3 +42,10 @@ void Odometry::update() {
 float Odometry::getX() { return _current_x; }
 float Odometry::getY() { return _current_y; }
 float Odometry::getYaw() { return _current_yaw; }
+
+void Odometry::getAll(float* x, float* y, float* yaw) {
+    *x = _current_x;
+    *y = _current_y;
+    *yaw = _current_yaw;
+    return;
+}

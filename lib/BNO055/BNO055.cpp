@@ -13,9 +13,6 @@ bool BNO055::begin() {
     // 1. CONFIGモードに設定
     _writeRegister(0x3D, 0x00);
     delay(20);
-    
-    //_writeRegister(0x3F, 0x20); // RST_SYS ビットを1に設定
-    //delay(1000); // リセット完了を待つ
 
     // 2. NDOFモードに設定
     _writeRegister(0x3D, 0x0C);
@@ -40,16 +37,16 @@ bool BNO055::begin() {
 // 起動時裏返しを検出すると、キャリブレーション開始
 void BNO055::isFliped() {
     delay(50);
-    if(getAccZ() < -8.0) {
+    if (getAccZ() < -8.0) {
         Serial.println("\n\n裏返しが検出されました。キャリブレーションしない場合、５秒以内に表向きにしてください");
         Serial.printf("0 _ _ 1 _ _ 2 _ _ 3 _ _ 4 _ _ 5\n|");
-        for(int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             delay(500);
             Serial.printf("**|");
-            if(getAccZ() > 5.0) return;
+            if (getAccZ() > 5.0) return;
         }
         Serial.println("");
-        if(getAccZ() < -8.0) {
+        if (getAccZ() < -8.0) {
             Serial.println("裏返しのままのため、キャリブレーションを開始します。");
             Serial.println("６面静止、８時の字に動かすなどしてキャリブレーション度を高めてください。");
             Serial.println("*******************************");
@@ -57,14 +54,14 @@ void BNO055::isFliped() {
             delay(1000);
             _writeRegister(0x3D, 0x0C); // NDOFモードに戻す
             delay(20);
-            while(!saveCalibration()) {
+            while (!saveCalibration()) {
                 int sys, gyr, acc, mag;
                 getCalibrationStatus(&sys, &gyr, &acc, &mag);
                 Serial.printf("sys:%d  gyr:%d  acc:%d  mag:%d\n", sys, gyr, acc, mag);
                 delay(800);
             }
             Serial.println("保存しました。再起動してください");
-            while(1) delay(1000);
+            while (1) delay(1000);
         }
     }
 }
@@ -102,11 +99,11 @@ void BNO055::_writeRegister(byte reg, byte value) {
     Wire.endTransmission();
 }
 
-void BNO055::_readRegister(byte reg, byte* data, int len) {
+void BNO055::_readRegister(byte reg, byte* data, uint8_t len) {
     Wire.beginTransmission(BNO055_I2C_ADDR);
     Wire.write(reg);
     Wire.endTransmission(false);
-    Wire.requestFrom(BNO055_I2C_ADDR, (uint8_t)len);
+    Wire.requestFrom((uint8_t)BNO055_I2C_ADDR, (uint8_t)len);
     for (int i = 0; i < len; i++) {
         data[i] = Wire.read();
     }

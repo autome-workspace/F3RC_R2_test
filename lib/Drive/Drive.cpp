@@ -14,11 +14,11 @@ void Drive::driveSetMax(uint8_t PWM_MAX, float MOTOR_SPD_MAX, float MOTOR_ACC_MA
     _MOTOR_ACC_MAX = MOTOR_ACC_MAX;
 }
 
-void Drive::driveSetLimit(float motorSpdLimit, float motorAccLimit) {
+void Drive::driveSetLimit(float MOTOR_SPD_LIMIT, float MOTOR_ACC_LIMIT) {
     //motorSpdLimit: 速度制限
     //motorAccLimit: 加速度制限
-    _motorSpdLimit = motorSpdLimit;
-    _motorAccLimit = motorAccLimit;
+    _motorSpdLimit = MOTOR_SPD_LIMIT;
+    _motorAccLimit = MOTOR_ACC_LIMIT;
 }
 
 //bool Drive::drive(float targetX, float targetY, float targetRadians) {}
@@ -28,20 +28,15 @@ bool Drive::drive(float targetX, float targetY) {
     float _current_y = _odometry->getY();
     float dx = targetX - _current_x;
     float dy = targetY - _current_y;
+    return true;
 
-
+    
 }
 
-void imadake(int _loopCount) {
-    for(int i = 0; i < 4; i++) {
-    motorWrite(i, sin(_loopCount / 80) * _motorSpdLimit);
-    }
-}
-
-bool Drive::drive(float targetRadians) {}
+bool Drive::drive(float targetRadians) {return true;}
 
 void Drive::motorWrite(uint8_t motorNum, float motorSpd) {
-    int PWM = _PWM_MAX * motorSpd / _MOTOR_SPD_MAX;
+    int PWM = _PWM_MAX * motorSpd / _motorSpdLimit;
     if(PWM > 0) {
         ledcWrite(motorNum, PWM);
         ledcWrite(motorNum + 4, PWM);

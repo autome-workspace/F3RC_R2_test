@@ -47,7 +47,7 @@ public:
 
 private:
     void _writeRegister(byte reg, byte value);
-    void _readRegister(byte reg, byte* data, int len);
+    void _readRegister(byte reg, byte* data, uint8_t len);
     int16_t _yawOffsetRaw; // ヨー角のオフセット値
 
     // キャリブレーションデータを取得・設定するプライベートヘルパー関数
