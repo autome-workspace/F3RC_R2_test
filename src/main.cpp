@@ -46,7 +46,7 @@ ORDERLIST ORDER_LIST[3] =
 // オドメトリ精度に直結
 #define ENCODER_WHEEL_RADIUS 4.1f // mm
 
-// お好みの最高速で（下の最高速はなるべく正確に）
+// お好みの最高速で(下の限界値をなるべく合わせる)
 #define MOTOR_PWM_MAX 800
 
 // 走行中に補正されていく(予定)
@@ -56,9 +56,6 @@ float MOTOR_ACC_MAX = 500.0f; // mm/s^2
 //指令リストで指定
 float ROBOT_SPD_LIMIT = 0.0f; // mm/s
 float ROBOT_ACC_LIMIT = 0.0f; // mm/s^2
-
-// こっちは大体でよい
-float MOTOR_WHEEL_RADIUS = 30.0f; // mm
 
 //制御レート
 #define MAIN_PULSE_RATE 1000 // Hz
@@ -85,7 +82,7 @@ void setup() {
     
     // BNO055の初期化
     if(!bno.begin()) {
-        Serial.println("BNO055 not found or failed to initialize.");
+        Serial.println("BNO055 failed to initialize.");
         while(1) delay(100);
     }
 
