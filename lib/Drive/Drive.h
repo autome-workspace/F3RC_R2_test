@@ -38,6 +38,8 @@ private:
     uint16_t _drive_pulse;
     float _wheelRadius;
 
+    void motorWrite(uint8_t motorNum, float motorSpd);
+
 };
 
 

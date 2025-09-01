@@ -5,5 +5,10 @@
   "keywords": "encoder, rotary, dual, PCNT, ESP32",
   "frameworks": "arduino",
   "platforms": "espressif32",
-  "dependencies": "madhephaestus/ESP32Encoder"
+  "dependencies": [
+  {
+    "name": "ESP32Encoder",
+    "owner": "madhephaestus"
+  }
+]
 }
