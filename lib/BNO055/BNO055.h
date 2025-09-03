@@ -30,13 +30,13 @@ public:
     // 初期化関数
     bool begin();
 
+    void changeToNDOF();
+    void changeToIMU();
+
     // キャリブレーションフラグ
     void isFliped();
 
-    // ヨー角を読み出す関数
     float getYaw();
-    //float getRawYaw();
-
     float getAccZ();
 
     // SYS (システム), GYR (ジャイロ), ACC (加速度), MAG (磁力計)

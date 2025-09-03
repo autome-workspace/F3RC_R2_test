@@ -44,7 +44,7 @@ ORDERLIST ORDER_LIST[3] =
 #define WHEELY_DISTANCE 0.0f // mm
 
 // オドメトリ精度に直結
-#define ENCODER_WHEEL_RADIUS 4.1f // mm
+#define ENCODER_WHEEL_RADIUS 24.1f // mm
 
 // お好みの最高速で(下の限界値をなるべく合わせる)
 #define MOTOR_PWM_MAX 800
@@ -76,14 +76,17 @@ void setup() {
     Serial.begin(921600);
 
     Wire.begin(I2C_SDA, I2C_SCL);
+
+    // I2C通信レートを400kHzに設定
+    Wire.setClock(400000); 
     
     // エンコーダの初期化
     encoder.begin();
     
     // BNO055の初期化
-    if(!bno.begin()) {
+    while(!bno.begin()) {
         Serial.println("BNO055 failed to initialize.");
-        while(1) delay(100);
+        delay(1000);
     }
 
     bno.isFliped(); // キャリブレーションフラグ

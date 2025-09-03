@@ -29,10 +29,11 @@ private:
     Encoder* _encoder;
     BNO055* _bno;
 
-    float _current_X = 0.0; // X position(mm)
-    float _current_Y = 0.0; // Y position(mm)
-    float _current_YAW = 0.0; // Orientation angle in radians
-    float _prev_YAW = 0.0; // Previous yaw angle in radians
+    float _current_X = 0.0f; // X position(mm)
+    float _current_Y = 0.0f; // Y position(mm)
+    float _current_YAW = 0.0f; // Orientation angle in radians
+    float _prev_YAW = 0.0f; // Previous yaw angle in radians
+
 };
 
 

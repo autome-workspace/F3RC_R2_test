@@ -16,7 +16,7 @@ public:
     void driveSetLimit(float ROBOT_SPD_LIMIT, float ROBOT_ACC_LIMIT);
 
 
-    bool drive(float targetX, float targetY, float targetRadians);
+    bool drive(float targetX, float targetY, float targetYAW);
     //bool drive(float targetX, float targetY);
     //bool drive(float targetRadians);
     //bool stop();
@@ -37,6 +37,9 @@ private:
     Odometry* _odometry;
 
     void motorWrite(uint8_t motorNum, float motorSpd);
+
+    // 
+    float K_rad()
 
 };
 

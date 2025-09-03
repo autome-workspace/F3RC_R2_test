@@ -9,14 +9,7 @@ BNO055::BNO055() {
 
 bool BNO055::begin() {
 
-    // レジスタアドレスやモード設定はデータシートを参照
-    // 1. CONFIGモードに設定
-    _writeRegister(0x3D, 0x00);
-    delay(20);
-
-    // 2. NDOFモードに設定
-    _writeRegister(0x3D, 0x0C);
-    delay(20);
+    changeToNDOF();
 
     // BNO055の接続確認
     byte chip_id;
@@ -32,6 +25,30 @@ bool BNO055::begin() {
         return true;
     }
     return false;
+}
+
+void BNO055::changeToNDOF() {
+
+    // 1. CONFIGモードに設定
+    _writeRegister(0x3D, 0x00);
+    delay(20);
+
+    // 2. NDOFモードに設定
+    _writeRegister(0x3D, 0x0C);
+    delay(20);
+
+}
+
+void BNO055::changeToIMU() {
+
+    // 1. CONFIGモードに設定
+    _writeRegister(0x3D, 0x00);
+    delay(20);
+
+    // 2. IMUモードに設定
+    _writeRegister(0x3D, 0x08);
+    delay(20);
+    
 }
 
 // 起動時裏返しを検出すると、キャリブレーション開始
@@ -123,6 +140,7 @@ void BNO055::getCalibrationStatus(int* sys, int* gyr, int* acc, int* mag) {
     *gyr = (calibStatus >> 4) & 0x03; // 次の2ビットをジャイロとして抽出
     *acc = (calibStatus >> 2) & 0x03; // 次の2ビットを加速度計として抽出
     *mag = calibStatus & 0x03;      // 下位2ビットを磁力計として抽出
+
 }
 
 // キャリブレーションデータをEEPROMから読み込む

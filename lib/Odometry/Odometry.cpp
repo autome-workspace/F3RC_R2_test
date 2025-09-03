@@ -37,6 +37,7 @@ void Odometry::update() {
     _current_X += dX_global;
     _current_X += dY_global;
     // _current_yawはBNO055から直接取得済み
+
 }
 
 float Odometry::getX() { return _current_X; }
@@ -47,5 +48,5 @@ void Odometry::getAll(float* X, float* Y, float* YAW) {
     *X = _current_X;
     *Y = _current_Y;
     *YAW = _current_YAW;
-    return;
+
 }
