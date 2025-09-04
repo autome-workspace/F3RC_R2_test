@@ -25,13 +25,14 @@ typedef struct {
 class BNO055 {
 public:
     // コンストラクタ
-    BNO055();
+    BNO055(uint8_t I2C_SDA, uint8_t I2C_SCL);
 
     // 初期化関数
     bool begin();
 
-    void changeToNDOF();
-    void changeToIMU();
+    bool changeToCONFIG();
+    bool changeToNDOF();
+    bool changeToIMU();
 
     // キャリブレーションフラグ
     void isFliped();
@@ -45,14 +46,20 @@ public:
     bool loadCalibration(); // キャリブレーションデータを読み込む関数
     bool saveCalibration(); // キャリブレーションデータを保存する関数
 
-private:
-    void _writeRegister(byte reg, byte value);
-    void _readRegister(byte reg, byte* data, uint8_t len);
-    int16_t _yawOffsetRaw; // ヨー角のオフセット値
-
     // キャリブレーションデータを取得・設定するプライベートヘルパー関数
     bool _getSensorOffsets(bno055_offsets_t &calibData);
-    void _setSensorOffsets(const bno055_offsets_t &calibData);
+    void _setSensorOffsets();
+    
+    bno055_offsets_t calibData;
+    uint8_t SDA, SCL;
+private:
+    bool _writeRegister(byte reg, byte value);
+    bool _readRegister(byte reg, byte* data, uint8_t len);
+    void i2cReset();
+    int16_t _yawOffsetRaw; // ヨー角のオフセット値
+    
+    int16_t last_YAW = 0;
+
 };
 
 #endif
