@@ -12,7 +12,7 @@ Odometry::Odometry(Encoder* encoder, BNO055* bno,
 void Odometry::begin() {
     _current_X = 0.0;
     _current_Y = 0.0;
-    _current_YAW = _bno->getYaw();
+    _current_YAW = _bno->getYAW();
     _prev_YAW = _current_YAW;
 }
 
@@ -20,7 +20,7 @@ void Odometry::update() {
     // 1. エンコーダから変位を取得
     float dx_raw = _encoder->getEncoder1Displacement();
     float dy_raw = _encoder->getEncoder2Displacement();
-    _current_YAW = _bno->getYaw();
+    _current_YAW = _bno->getYAW();
     float dyaw = (_current_YAW - _prev_YAW);
     if (dyaw < -M_PI) dyaw += 2*M_PI;
     if (dyaw > M_PI) dyaw -= 2*M_PI;

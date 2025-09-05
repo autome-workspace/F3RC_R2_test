@@ -68,13 +68,13 @@ bool BNO055::begin() {
 bool BNO055::changeToCONFIG() {
     // CONFIGモードに設定
     bool error = _writeRegister(0x3D, 0x00);
-    delay(10); // 推奨7ms
+    delay(20); // 推奨7ms
     return error;
 }
 
 bool BNO055::changeToNDOF() {
     // NDOFモードに設定
-    bool error = _writeRegister(0x3D, 0x0C);
+    bool error = _writeRegister(0x3D, 0x0B); // NDOF: oxoC NDOF_FMC_OFF: 0x0B
     delay(20); // 推奨19ms
     return error;
 }
@@ -117,8 +117,8 @@ void BNO055::isFliped() {
     }
 }
 
-float BNO055::getYaw() {
-    // ヨー角レジスタは2バイト（LSBとMSB）
+float BNO055::getYAW() {
+    // ヨー角レジスタは2バイト（LSBとMSB)
     byte data[2];
     int16_t yawRaw;
     
@@ -150,6 +150,28 @@ float BNO055::getAccZ() {
     return (accZRaw/ 100.0f);
 }
 
+uint8_t BNO055::getOperatingMode() {
+    byte mode;
+    _readRegister(0x3D, &mode, 1);
+    return mode;
+}
+
+void BNO055::fixYAW() {
+    float currentYaw = getYAW();
+    changeToCONFIG();
+    changeToNDOF();
+
+    byte data[2];
+    _readRegister(0x1A, data, 2);
+    int16_t ndofYawRaw = (data[1] << 8) | data[0];
+    float ndofYaw = (float)ndofYawRaw / 16.0f;
+
+    float drift = ndofYaw - currentYaw;
+    //_yawCorrection += drift;
+
+    changeToCONFIG();
+    changeToIMU();
+}
 bool BNO055::_writeRegister(byte reg, byte value) {
     Wire.beginTransmission(BNO055_I2C_ADDR);
     Wire.write(reg);

@@ -106,6 +106,8 @@ void setup() {
 
     //drive.driveSetMecanumX(DRIVE_WHEEL_X, DRIVE_WHEEL_Y);
     drive.driveSetOmni(DRIVE_WHEEL_DISTANCE, DRIVE_WHEEL_NUMBER);
+
+
 }
 
 void loop() {
@@ -120,7 +122,9 @@ void loop() {
     while(micros() % (1000000 / MAIN_PULSE_RATE) > 1);
     if(loopCount % (MAIN_PULSE_RATE / ODOM_PULSE_RATE) == 0) {
         odometry.update();
-        Serial.printf("%7f\n", odometry.getYAW());
+        Serial.print(odometry.getYAW());
+        Serial.print("  ");
+        Serial.println(bno.getOperatingMode());
     }
 
 

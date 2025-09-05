@@ -24,40 +24,30 @@ typedef struct {
 
 class BNO055 {
 public:
-    // コンストラクタ
+
     BNO055(uint8_t I2C_SDA, uint8_t I2C_SCL);
-
-    // 初期化関数
     bool begin();
-
     bool changeToCONFIG();
     bool changeToNDOF();
     bool changeToIMU();
-
-    // キャリブレーションフラグ
     void isFliped();
-
-    float getYaw();
+    float getYAW();
     float getAccZ();
-
-    // SYS (システム), GYR (ジャイロ), ACC (加速度), MAG (磁力計)
+    uint8_t getOperatingMode();
+    void fixYAW();
     void getCalibrationStatus(int* sys, int* gyr, int* acc, int* mag);
-
     bool loadCalibration(); // キャリブレーションデータを読み込む関数
     bool saveCalibration(); // キャリブレーションデータを保存する関数
-
-    // キャリブレーションデータを取得・設定するプライベートヘルパー関数
     bool _getSensorOffsets(bno055_offsets_t &calibData);
     void _setSensorOffsets();
     
-    bno055_offsets_t calibData;
-    uint8_t SDA, SCL;
 private:
     bool _writeRegister(byte reg, byte value);
     bool _readRegister(byte reg, byte* data, uint8_t len);
     void i2cReset();
     int16_t _yawOffsetRaw; // ヨー角のオフセット値
-    
+    bno055_offsets_t calibData;
+    uint8_t SDA, SCL;
     int16_t last_YAW = 0;
 
 };
